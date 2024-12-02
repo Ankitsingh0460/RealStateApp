@@ -38,7 +38,10 @@ export const signin = async (req, res, next) => {
     if (!matchPassword) return next(errorHandler(401, "Invalid credentials!"));
     const token = jwt.sign({ id: isValidUser._id }, process.env.JWT_SECRET);
     const { password: pass, ...rest } = isValidUser._doc;
-    res.cookie("UID", token, { httpOnly: true }).status(200).json(rest);
+    res
+      .cookie("access_token", token, { httpOnly: true })
+      .status(200)
+      .json(rest);
   } catch (error) {
     next(error);
   }
@@ -75,6 +78,15 @@ export const google = async (req, res, next) => {
         .status(200)
         .json(rest);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signout = (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    res.status(200).json("Signout Successfully");
   } catch (error) {
     next(error);
   }
