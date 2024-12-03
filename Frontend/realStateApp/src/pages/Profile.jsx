@@ -1,21 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   signoutStart,
   signoutFailure,
   signoutSuccess,
+  updateSuccess,
+  updateFailure,
+  updateStart,
 } from "../redux/user/userSlice";
 
 function Profile() {
   const { currentUser } = useSelector((s) => s.user);
+  const [formData, setFormData] = useState({});
+
   const dispatch = useDispatch();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (data.success === false) {
+        dispatch(updateFailure(data.message));
+        return;
+      }
+      dispatch(updateSuccess(data));
+    } catch (error) {
+      dispatch(updateFailure(data.message));
+    }
+  };
 
   const handleSignout = async () => {
     try {
       dispatch(signoutStart());
       const res = await fetch("/api/auth/signout");
       const data = res.json();
-      console.log(data);
       if (data.success === false) {
         dispatch(signoutFailure(data.message));
         return;
@@ -30,26 +61,34 @@ function Profile() {
       <div className="p-3 max-w-lg mx-auto">
         <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
 
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <img
             className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
             src={currentUser.avatar}
             alt="profile"
           />
+          {currentUser.message && (
+            <h2 className="text-blue-600 text-center">{currentUser.message}</h2>
+          )}
           <input
+            onChange={handleChange}
             type="text"
-            placeholder="Username"
+            placeholder="username"
+            defaultValue={currentUser.username}
             className="border p-3 rounded-lg "
             id="username"
           />
           <input
+            onChange={handleChange}
+            defaultValue={currentUser.email}
             type="text"
             placeholder="Email"
             className="border p-3 rounded-lg"
             id="email"
           />
           <input
-            type="text"
+            onChange={handleChange}
+            type="password"
             placeholder="Password"
             className="border p-3 rounded-lg"
             id="password"
