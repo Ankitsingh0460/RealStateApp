@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   signoutStart,
   signoutFailure,
@@ -7,11 +8,15 @@ import {
   updateSuccess,
   updateFailure,
   updateStart,
+  deleteUserSuccess,
+  deleteUserFailure,
+  deleteUserStart,
 } from "../redux/user/userSlice";
 
 function Profile() {
-  const { currentUser } = useSelector((s) => s.user);
+  const { currentUser, loading, error } = useSelector((s) => s.user);
   const [formData, setFormData] = useState({});
+  const [updateSuccesss, setUpdateSuccesss] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -37,6 +42,7 @@ function Profile() {
         return;
       }
       dispatch(updateSuccess(data));
+      setUpdateSuccesss(true);
     } catch (error) {
       dispatch(updateFailure(data.message));
     }
@@ -47,6 +53,7 @@ function Profile() {
       dispatch(signoutStart());
       const res = await fetch("/api/auth/signout");
       const data = res.json();
+
       if (data.success === false) {
         dispatch(signoutFailure(data.message));
         return;
@@ -56,6 +63,24 @@ function Profile() {
       dispatch(signoutFailure(data.message));
     }
   };
+
+  const handleUserDelete = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
   return (
     <>
       <div className="p-3 max-w-lg mx-auto">
@@ -67,9 +92,7 @@ function Profile() {
             src={currentUser.avatar}
             alt="profile"
           />
-          {currentUser.message && (
-            <h2 className="text-blue-600 text-center">{currentUser.message}</h2>
-          )}
+
           <input
             onChange={handleChange}
             type="text"
@@ -94,11 +117,16 @@ function Profile() {
             id="password"
           />
           <button className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-90 disabled:opacity-80 uppercase">
-            UPDATE
+            {loading ? "Loading..." : "Update"}
           </button>
         </form>
         <div className="flex justify-between mt-3">
-          <span className="text-red-700 cursor-pointer">Delete account?</span>
+          <span
+            onClick={handleUserDelete}
+            className="text-red-700 cursor-pointer"
+          >
+            Delete account?
+          </span>
           <span
             onClick={handleSignout}
             className="text-red-700 cursor-pointer "
@@ -106,6 +134,10 @@ function Profile() {
             Sign out
           </span>
         </div>
+        <p className="text-red-700 mt-5">{error ? error : ""}</p>
+        <p className="text-green-700 mt-5">
+          {updateSuccesss ? "User is updated successfully!" : ""}
+        </p>
       </div>
     </>
   );
