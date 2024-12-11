@@ -12,6 +12,7 @@ import {
   deleteUserFailure,
   deleteUserStart,
 } from "../redux/user/userSlice";
+import { Link } from "react-router-dom";
 
 function Profile() {
   const { currentUser, loading, error } = useSelector((s) => s.user);
@@ -119,6 +120,12 @@ function Profile() {
           <button className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-90 disabled:opacity-80 uppercase">
             {loading ? "Loading..." : "Update"}
           </button>
+          <Link
+            className="bg-green-700 p-3 rounded-lg uppercase text-center hover:opacity-95 text-white"
+            to={"/create-listing"}
+          >
+            Create Listing
+          </Link>
         </form>
         <div className="flex justify-between mt-3">
           <span
