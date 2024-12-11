@@ -1,9 +1,9 @@
 import express from "express";
 
-import { create } from "../controller/listing.controller.js";
+import { createListing } from "../controller/listing.controller.js";
 import { tokenverify } from "../utils/tokenverify.js";
 const router = express.Router();
 
-router.post("/create", tokenverify, create);
+router.post("/create", tokenverify, createListing);
 
 export default router;
