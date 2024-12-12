@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function CreateListing() {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resData, setResData] = useState({});
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((s) => s.user);
   const [formData, setFormData] = useState({
     imageUrls: [],
     name: "",
@@ -11,13 +17,13 @@ function CreateListing() {
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 50,
-    discountPrice: 50,
+    discountPrice: 0,
     offer: false,
     parking: false,
     furnished: false,
   });
   console.log(formData);
-  const { loading, error } = useSelector((state) => state.user);
+
   const handleChange = (e) => {
     if (e.target.id === "sale" || e.target.id === "rent") {
       setFormData({
@@ -48,19 +54,54 @@ function CreateListing() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (+formData.regularPrice < +formData.discountPrice)
+        return setError("Discounted price must be lower than regular price");
+      setLoading(true);
+      setError(false);
+      const res = await fetch("/api/listing/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),
+      });
+      const data = await res.json();
+      console.log(data);
+      setResData(data);
+
+      setLoading(false);
+      if (data.success === false) {
+        setError(data.messages);
+      }
+      navigate(`/listing/${data.listing._id}`);
     } catch (error) {
-      next(error);
+      setError(error.message);
+      setLoading(false);
     }
   };
+
   return (
     <>
       <main className="p-3 max-w-4xl mx-auto">
         <h1 className="text-3xl font-semibold text-center my-7">
           Create a Listing
         </h1>
+        {error && (
+          <p className="text-red-700 text-center font-bold text-lg mt-1 mb-6">
+            {error}
+          </p>
+        )}
+        {resData && (
+          <p className="text-blue-700 font-bold text-2xl text-center mt-1 mb-6">
+            {resData.message}
+          </p>
+        )}
         <form
           className="flex flex-col sm:flex-row gap-4"
           onSubmit={handleSubmit}
@@ -72,7 +113,7 @@ function CreateListing() {
               className="border p-3 rounded-lg "
               id="name"
               maxLength="62"
-              minLength="10"
+              minLength="5"
               required
               onChange={handleChange}
               value={formData.name}
@@ -190,22 +231,24 @@ function CreateListing() {
                   <span className="text-xs">($ / month)</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  id="discountPrice"
-                  min="10"
-                  max="100000"
-                  required
-                  className="p-3 border border-gray-300 rounded-lg"
-                  onChange={handleChange}
-                  value={formData.discountPrice}
-                />
-                <div className="flex flex-col items-center">
-                  <p>Discounted Price</p>
-                  <span className="text-xs">($ / month)</span>
+              {formData.offer && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    id="discountPrice"
+                    min="0"
+                    max="100000"
+                    required
+                    className="p-3 border border-gray-300 rounded-lg"
+                    onChange={handleChange}
+                    value={formData.discountPrice}
+                  />
+                  <div className="flex flex-col items-center">
+                    <p>Discounted Price</p>
+                    <span className="text-xs">($ / month)</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
           <div className=" flex flex-col flex-1 gap-4">
@@ -228,8 +271,12 @@ function CreateListing() {
                 Upload
               </button>
             </div>
-            <button className="p-3 bg-blue-700 rounded-lg uppercase text-white hover:opacity-95 disabled:opacity-80 mt-2">
-              Create Listing
+            {}
+            <button
+              disabled={loading}
+              className="p-3 bg-blue-700 rounded-lg uppercase text-white hover:opacity-95 disabled:opacity-80 mt-2"
+            >
+              {loading ? "Creating..." : "Create Listing"}
             </button>
           </div>
         </form>
