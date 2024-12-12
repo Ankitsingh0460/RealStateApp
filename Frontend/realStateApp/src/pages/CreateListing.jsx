@@ -127,8 +127,10 @@ function CreateListing() {
                 Upload
               </button>
             </div>
+            <button className="p-3 bg-blue-700 rounded-lg uppercase text-white hover:opacity-95 disabled:opacity-80 mt-2">
+              Create Listing
+            </button>
           </div>
-          <button className="p-3 bg-slate-100">Create Listing</button>
         </form>
       </main>
     </>
