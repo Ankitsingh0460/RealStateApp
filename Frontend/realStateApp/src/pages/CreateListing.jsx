@@ -9,7 +9,12 @@ function CreateListing() {
   const navigate = useNavigate();
   const { currentUser } = useSelector((s) => s.user);
   const [formData, setFormData] = useState({
-    imageUrls: [],
+    imageUrls: [
+      "https://sharpframemedia.com/wp-content/uploads/2020/02/SharpFrameMedia-TwilightPhotography-1.jpg",
+      "https://images.pexels.com/photos/210617/pexels-photo-210617.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "https://images.pexels.com/photos/87223/pexels-photo-87223.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    ],
     name: "",
     description: "",
     address: "",
@@ -267,11 +272,36 @@ function CreateListing() {
                 accept="image/*"
                 multiple
               />
-              <button className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80 ">
+              <button
+                type="button"
+                className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80 "
+              >
                 Upload
               </button>
             </div>
-            {}
+            <div className="flex gap-4">
+              <img
+                src="https://sharpframemedia.com/wp-content/uploads/2020/02/SharpFrameMedia-TwilightPhotography-1.jpg"
+                alt="listing image"
+                className="w-20 h-20 object-contain rounded-lg"
+              />
+              <img
+                src="https://images.pexels.com/photos/210617/pexels-photo-210617.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                alt="listing image"
+                className="w-20 h-20 object-contain rounded-lg"
+              />
+              <img
+                src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                alt="listing image"
+                className="w-20 h-20 object-contain rounded-lg"
+              />
+              <img
+                src="https://images.pexels.com/photos/87223/pexels-photo-87223.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="listing image"
+                className="w-20 h-20 object-contain rounded-lg"
+              />
+            </div>
+
             <button
               disabled={loading}
               className="p-3 bg-blue-700 rounded-lg uppercase text-white hover:opacity-95 disabled:opacity-80 mt-2"

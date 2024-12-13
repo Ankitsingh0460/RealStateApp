@@ -89,7 +89,7 @@ function Profile() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <img
-            className="rounded-full h-24 w-24 object-cover cursor-pointer self-center"
+            className="rounded-full h-24 w-24 object-cover  self-center"
             src={currentUser.avatar}
             alt="profile"
           />

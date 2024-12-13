@@ -47,9 +47,8 @@ const listingSchema = new mongoose.Schema(
       required: true,
     },
     imageUrls: {
-      type: Array,
-      default:
-        "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?cs=srgb&dl=pexels-binyaminmellish-106399.jpg&fm=jpg",
+      type: [String],
+      required: true,
     },
     userRef: {
       type: String,
