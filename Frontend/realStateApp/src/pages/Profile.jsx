@@ -18,6 +18,10 @@ function Profile() {
   const { currentUser, loading, error } = useSelector((s) => s.user);
   const [formData, setFormData] = useState({});
   const [updateSuccesss, setUpdateSuccesss] = useState(false);
+  const [showListingError, setShowListingError] = useState(false);
+  const [userListing, setUserListing] = useState([]);
+  const [deleteUserListing, setDeleteUserListing] = useState();
+  const [updateError, setUpdateError] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -37,7 +41,7 @@ function Profile() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
+
       if (data.success === false) {
         dispatch(updateFailure(data.message));
         return;
@@ -80,6 +84,46 @@ function Profile() {
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
+  };
+
+  const handleListingClick = async () => {
+    try {
+      setShowListingError(false);
+      const res = await fetch(`/api/user/listing/${currentUser._id}`);
+      const data = await res.json();
+
+      if (data.success === false) {
+        setShowListingError(true);
+        return;
+      }
+      setUserListing(data);
+    } catch (error) {
+      setShowListingError(true);
+    }
+  };
+  const handleListingDelete = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setDeleteUserListing(data);
+
+      setUserListing((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleListingEdit = async (listingId) => {
+    try {
+    } catch (error) {}
   };
 
   return (
@@ -145,6 +189,64 @@ function Profile() {
         <p className="text-green-700 mt-5">
           {updateSuccesss ? "User is updated successfully!" : ""}
         </p>
+        <button
+          onClick={handleListingClick}
+          className="text-white w-full border p-1 bg-blue-700 rounded-full uppercase"
+        >
+          Show Listing
+        </button>
+        <p className="text-red-700 mt-5">
+          {showListingError ? "Error in Showing listing" : ""}
+        </p>
+        {userListing && userListing.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <h1 className="text-center mt-7 text-2xl font-semibold">
+              Your Listings
+            </h1>
+            {deleteUserListing && (
+              <p className="text-red-700 text-center">
+                {deleteUserListing.message}
+              </p>
+            )}
+            {userListing.map((listing) => (
+              <div
+                key={listing._id}
+                className="border rounded-lg p-3 flex justify-between items-center gap-4"
+              >
+                <Link to={`/listing/${listing._id}`}>
+                  <img
+                    src={listing.imageUrls[3]}
+                    alt="listing cover"
+                    className="h-16 w-16 object-contain"
+                  />
+                </Link>
+                <Link
+                  className="text-slate-700 font-semibold  hover:underline truncate flex-1"
+                  to={`/listing/${listing._id}`}
+                >
+                  <p>{listing.name}</p>
+                </Link>
+
+                <div className="flex flex-col item-center">
+                  <button
+                    onClick={() => handleListingDelete(listing._id)}
+                    className="text-red-700 uppercase"
+                  >
+                    Delete
+                  </button>
+                  <Link to={`/update-listing/${listing._id}`}>
+                    <button
+                      onClick={() => handleListingEdit(listing._id)}
+                      className="text-green-700 uppercase"
+                    >
+                      Edit
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
