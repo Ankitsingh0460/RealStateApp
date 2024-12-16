@@ -102,6 +102,7 @@ function UpdateListing() {
       if (data.success === false) {
         setError(data.messages);
       }
+      navigate(`/listing/${data.updateListing._id}`);
     } catch (error) {
       setError(error.message);
       setLoading(false);

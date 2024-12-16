@@ -129,7 +129,7 @@ function Profile() {
   return (
     <>
       <div className="p-3 max-w-lg mx-auto">
-        <h1 className="text-3xl text-center font-semibold my-7">Profile</h1>
+        <h1 className="text-3xl text-center font-semibold my-4">Profile</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <img
@@ -137,7 +137,13 @@ function Profile() {
             src={currentUser.avatar}
             alt="profile"
           />
-
+          <p className="text-red-700 text-center">{error ? error : ""}</p>
+          <p className="text-green-700 text-center">
+            {updateSuccesss ? "User is updated successfully!" : ""}
+          </p>
+          <p className="text-red-700  text-center">
+            {showListingError ? "Error in Showing listing" : ""}
+          </p>
           <input
             onChange={handleChange}
             type="text"
@@ -185,19 +191,14 @@ function Profile() {
             Sign out
           </span>
         </div>
-        <p className="text-red-700 mt-5">{error ? error : ""}</p>
-        <p className="text-green-700 mt-5">
-          {updateSuccesss ? "User is updated successfully!" : ""}
-        </p>
+
         <button
           onClick={handleListingClick}
-          className="text-white w-full border p-1 bg-blue-700 rounded-full uppercase"
+          className="mt-4 text-white w-full border p-1 bg-blue-700 rounded-full uppercase"
         >
           Show Listing
         </button>
-        <p className="text-red-700 mt-5">
-          {showListingError ? "Error in Showing listing" : ""}
-        </p>
+
         {userListing && userListing.length > 0 && (
           <div className="flex flex-col gap-4">
             <h1 className="text-center mt-7 text-2xl font-semibold">
